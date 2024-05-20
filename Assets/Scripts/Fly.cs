@@ -35,6 +35,7 @@ public class Fly : MonoBehaviour
         canMove = false;
         Collider2D _collider = GetComponent<Collider2D>();
         _collider.enabled = false;
+        UIBehaviour.instance.onFlyKill();
         StartCoroutine(Die());
     }
 
@@ -54,5 +55,10 @@ public class Fly : MonoBehaviour
             Debug.Log("Should die, player touched me!");
             onDeath();
         }
+    }
+
+    private void OnDestroy()
+    {
+        FlySpawner.instance.spawnedFlies.Remove(this);
     }
 }

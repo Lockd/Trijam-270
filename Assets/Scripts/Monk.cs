@@ -5,6 +5,7 @@ public class Monk : MonoBehaviour
 {
     [SerializeField] private float growthSpeed = 3f;
     [SerializeField] private float disturbanceRangeReduction = 0.25f;
+    private float initialScale;
 
     public static Monk instance;
     private void Awake()
@@ -13,9 +14,20 @@ public class Monk : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    private void Start()
+    {
+        initialScale = transform.localScale.x;
+        UIBehaviour.instance.onGameStartEvent.AddListener(() =>
+        {
+            transform.localScale = new Vector3(initialScale, initialScale, 1);
+        });
+    }
+
     void Update()
     {
         float currentSize = transform.localScale.x + growthSpeed * Time.deltaTime;
+        if (currentSize < 0f) currentSize = 0f;
+        
         transform.localScale = new Vector3(currentSize, currentSize, 1);
     }
 
@@ -26,8 +38,7 @@ public class Monk : MonoBehaviour
 
         if (currentSize <= 0)
         {
-            Debug.Log("Game Over!");
-            Time.timeScale = 0;
+            UIBehaviour.instance.onGameOver();
         }
     }
 

@@ -6,22 +6,29 @@ public class CameraBehaviour : MonoBehaviour
     private Camera _camera;
     [SerializeField] private float scaleSpeed = 1f;
     [SerializeField] private AnimationCurve curve;
+    private float baseTime = 0f;
+    private float startSize;
 
     void Start()
     {
         _camera = GetComponent<Camera>();
+
+        baseTime = Time.time;
+
+        startSize = _camera.orthographicSize;
+
+        UIBehaviour.instance.onGameStartEvent.AddListener(() =>
+        {
+            baseTime = Time.time;
+            _camera.orthographicSize = startSize;
+        });
     }
 
     void Update()
     {
+        if (_camera.orthographicSize >= maxSize || !UIBehaviour.instance.isPlaying) return;
 
-        if (_camera.orthographicSize >= maxSize) return;
-        
-        // float additionalScale = scaleSpeed * Time.deltaTime;
-
-        // curve.Evaluate(Time.time / 100f);
-        
-        _camera.orthographicSize = curve.Evaluate(Time.time);
-        FlySpawner.instance.increaseScale(_camera.orthographicSize / 2);
+        _camera.orthographicSize = curve.Evaluate(Time.time - baseTime);
+        FlySpawner.instance.increaseScale(_camera.orthographicSize / 2.5f);
     }
 }
